@@ -1,3 +1,5 @@
 # EGKfeuer
+currently the project can be found under: 
+https://github.com/elnin0815/EGKfhir/
 
-initial commit comming soon!
+it will move to this repo soon
