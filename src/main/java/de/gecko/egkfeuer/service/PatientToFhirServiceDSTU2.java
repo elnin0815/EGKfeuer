@@ -43,6 +43,7 @@ public class PatientToFhirServiceDSTU2 {
                 .setSystem("http://fhir.de/NamingSystem/gkv/kvnr")
                 .setValue(patient.getHealthInsuranceNumber());
         //setName
+        //TODO: HumanName.text adden
         HumanNameDt name = new HumanNameDt();
         name.addFamily(patient.getSurname())
                 .addGiven(patient.getGivenName())
@@ -90,11 +91,11 @@ public class PatientToFhirServiceDSTU2 {
 
         Organization healthInsurance = new Organization();
         healthInsurance.addIdentifier()
-                .setSystem("http://fhir.de/NamingSystem/gkv/iknr")
+                .setSystem("http://fhir.de/NamingSystem/arge-ik/iknr")
                 .setValue(patient.getHealthInsuranceProviderNumber());
         healthInsurance.setName(patient.getHealthInsuranceProviderName());
         IdDt idInsurance = (IdDt) client.update().resource(healthInsurance).conditional()
-                .where(Organization.IDENTIFIER.exactly().systemAndIdentifier("http://fhir.de/NamingSystem/gkv/iknr",patient.getHealthInsuranceProviderNumber()))
+                .where(Organization.IDENTIFIER.exactly().systemAndIdentifier("http://fhir.de/NamingSystem/arge-ik/iknr",patient.getHealthInsuranceProviderNumber()))
                 .execute().getId();
         logger.info("Organization with ID: " + idInsurance + " generated");
 

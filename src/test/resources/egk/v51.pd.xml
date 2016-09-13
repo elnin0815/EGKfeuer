@@ -9,6 +9,9 @@
 			<Vorname>Max</Vorname>
 			<Nachname>Muster</Nachname>
 			<Geschlecht>M</Geschlecht>
+			<Vorsatzwort>Vorsatzwort</Vorsatzwort>
+			<Namenszusatz>Namenszusatz</Namenszusatz>
+			<Titel>Dr.</Titel>
 			<StrassenAdresse>
 				<Postleitzahl>69120</Postleitzahl>
 				<Ort>Heidelberg</Ort>
