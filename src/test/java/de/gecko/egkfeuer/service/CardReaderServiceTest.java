@@ -7,7 +7,7 @@ import de.gecko.egkfeuer.exception.smartcard.CardAccessException;
 import de.gecko.egkfeuer.exception.smartcard.CardDecisionException;
 import de.gecko.egkfeuer.exception.smartcard.EgkNotFoundException;
 import de.gecko.egkfeuer.exception.smartcard.UnsupportedEgkException;
-import de.gecko.egkfeuer.model.PatientWrapper;
+import de.gecko.egkfeuer.model.EgkPatient;
 import de.gecko.egkfeuer.model.Sex;
 import de.gecko.egkfeuer.model.ekg.ToPatientConverter;
 import de.gecko.egkfeuer.model.ekg.v51.pd.UCPersoenlicheVersichertendatenXML;
@@ -61,10 +61,10 @@ public class CardReaderServiceTest
 		cardReaderService = new CardReaderServiceImpl(new ToPatientConverter()
 		{
 			@Override
-			public PatientWrapper toPatient(String pdContent, String vdContent)
+			public EgkPatient toPatient(String pdContent, String vdContent)
 			{
-				return new PatientWrapper("title", "givenName", "surname", LocalDate.now(), Sex.FEMALE, "zip", "city",
-						"streetAndNumber", "healthInsuranceProviderNumber", "healthInsuranceNumber");
+				return new EgkPatient("title", "givenName", "surname", "vorsatzwort", "namenszusatz", LocalDate.now(), Sex.FEMALE, "zip", "city",
+						"streetname", "housenumber", "healthInsuranceProviderNumber", "healthInsuranceNumber", "versichertenID");
 			}
 
 			@Override
@@ -121,7 +121,7 @@ public class CardReaderServiceTest
 	public void testReadEgkG0() throws Exception
 	{
 		insertTerminal(EgkSimG0.class);
-		PatientWrapper read = cardReaderService.read();
+		EgkPatient read = cardReaderService.read();
 		assertNotNull(read.getSurname());
 	}
 
@@ -129,7 +129,7 @@ public class CardReaderServiceTest
 	public void testReadEgkG1() throws Exception
 	{
 		insertTerminal(EgkSimG1.class);
-		PatientWrapper read = cardReaderService.read();
+		EgkPatient read = cardReaderService.read();
 		assertNotNull(read.getSurname());
 	}
 
@@ -137,7 +137,7 @@ public class CardReaderServiceTest
 	public void testReadEgkG1Plus() throws Exception
 	{
 		insertTerminal(EgkSimG1Plus.class);
-		PatientWrapper read = cardReaderService.read();
+		EgkPatient read = cardReaderService.read();
 		assertNotNull(read.getSurname());
 	}
 

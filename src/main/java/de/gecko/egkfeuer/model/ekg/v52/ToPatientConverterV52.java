@@ -1,6 +1,6 @@
 package de.gecko.egkfeuer.model.ekg.v52;
 
-import de.gecko.egkfeuer.model.PatientWrapper;
+import de.gecko.egkfeuer.model.EgkPatient;
 import de.gecko.egkfeuer.model.ekg.AbstractToPatientConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +30,7 @@ public class ToPatientConverterV52 extends AbstractToPatientConverter
 	}
 
 	@Override
-	public PatientWrapper toPatient(String pdContent, String vdContent)
+	public EgkPatient toPatient(String pdContent, String vdContent)
 	{
 		if (!isPdCompatible(pdContent))
 			throw new IllegalArgumentException("pdContent not compatible");
@@ -48,6 +48,9 @@ public class ToPatientConverterV52 extends AbstractToPatientConverter
 		String titel = pd.getVersicherter().getPerson().getTitel();
 		String vorname = pd.getVersicherter().getPerson().getVorname();
 		String nachname = pd.getVersicherter().getPerson().getNachname();
+		String vorsatzwort = pd.getVersicherter().getPerson().getVorsatzwort();
+		String namenszusatz = pd.getVersicherter().getPerson().getNamenszusatz();
+
 		LocalDate geburtsdatum = LocalDate.parse(pd.getVersicherter().getPerson().getGeburtsdatum(),
 				DateTimeFormatter.ofPattern("yyyyMMdd"));
 		String geschlecht = pd.getVersicherter().getPerson().getGeschlecht();
@@ -60,8 +63,9 @@ public class ToPatientConverterV52 extends AbstractToPatientConverter
 
 		String kostentraegerkennung = vd.getVersicherter().getVersicherungsschutz().getKostentraeger()
 				.getKostentraegerkennung().toString();
+		String kostentraegerName = vd.getVersicherter().getVersicherungsschutz().getKostentraeger().getName();
 
-		return new PatientWrapper(titel, vorname, nachname, geburtsdatum, toSex(geschlecht), postleitzahl, ort, strasse
-				+ " " + hausnummer, kostentraegerkennung, versichertenID);
+		return new EgkPatient(titel, vorname, nachname, vorsatzwort, namenszusatz, geburtsdatum, toSex(geschlecht), postleitzahl, ort, strasse,
+				hausnummer, kostentraegerkennung, kostentraegerName, versichertenID);
 	}
 }

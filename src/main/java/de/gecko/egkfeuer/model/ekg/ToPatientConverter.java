@@ -1,6 +1,6 @@
 package de.gecko.egkfeuer.model.ekg;
 
-import de.gecko.egkfeuer.model.PatientWrapper;
+import de.gecko.egkfeuer.model.EgkPatient;
 
 public interface ToPatientConverter
 {
@@ -18,5 +18,5 @@ public interface ToPatientConverter
 	 * @see #isPdCompatible(String)
 	 * @see #isVdCompatible(String)
 	 */
-	PatientWrapper toPatient(String pdContent, String vdContent);
+	EgkPatient toPatient(String pdContent, String vdContent);
 }

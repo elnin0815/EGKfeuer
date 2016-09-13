@@ -2,7 +2,7 @@ package de.gecko.egkfeuer.service;
 
 import de.gecko.egkfeuer.exception.smartcard.*;
 import de.gecko.egkfeuer.exception.smartcard.CardException;
-import de.gecko.egkfeuer.model.PatientWrapper;
+import de.gecko.egkfeuer.model.EgkPatient;
 import de.gecko.egkfeuer.model.ekg.ToPatientConverter;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.IOUtils;
@@ -48,7 +48,7 @@ public class CardReaderServiceImpl implements CardReaderService
 	}
 
 	@Override
-	public PatientWrapper read() throws CardException
+	public EgkPatient read() throws CardException
 	{
 
 
@@ -58,7 +58,7 @@ public class CardReaderServiceImpl implements CardReaderService
 		Card card = null;
 		try
 		{
-			PatientWrapper patient = null;
+			EgkPatient patient = null;
 			int egkcounter = 0;
 
 			List<CardTerminal> terminals = cardTerminals.terminals().list(State.CARD_PRESENT);
@@ -113,7 +113,7 @@ public class CardReaderServiceImpl implements CardReaderService
 		}
 	}
 
-	private PatientWrapper readFromCardChannel(CardChannel channel) throws CardException
+	private EgkPatient readFromCardChannel(CardChannel channel) throws CardException
 	{
 		logger.debug("Selecting root");
 

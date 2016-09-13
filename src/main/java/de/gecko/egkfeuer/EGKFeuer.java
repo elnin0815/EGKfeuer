@@ -1,6 +1,6 @@
 package de.gecko.egkfeuer;
 
-import de.gecko.egkfeuer.model.PatientWrapper;
+import de.gecko.egkfeuer.model.EgkPatient;
 import de.gecko.egkfeuer.model.ekg.DelegatingToPatientConverter;
 import de.gecko.egkfeuer.model.ekg.v51.ToPatientConverterV51;
 import de.gecko.egkfeuer.model.ekg.v52.ToPatientConverterV52;
@@ -26,7 +26,7 @@ public class EGKFeuer {
             timeout = "10";
 
         CardReaderService cardReaderService = new CardReaderServiceImpl(new DelegatingToPatientConverter(new ToPatientConverterV51(), new ToPatientConverterV52()), new CardTerminalsServiceImpl());
-        PatientWrapper patient = cardReaderService.read();
+        EgkPatient patient = cardReaderService.read();
         PatientToFhirServiceDSTU2 patientToFhirServiceDSTU2 = new PatientToFhirServiceDSTU2(fHIRServerBase);
         patientToFhirServiceDSTU2.sendPatientToFhirServer(patient);
     }

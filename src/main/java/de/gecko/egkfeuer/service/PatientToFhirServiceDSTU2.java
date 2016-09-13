@@ -1,14 +1,20 @@
 package de.gecko.egkfeuer.service;
 
 import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.model.api.ExtensionDt;
 import ca.uhn.fhir.model.api.ResourceMetadataKeyEnum;
 import ca.uhn.fhir.model.dstu2.composite.AddressDt;
+import ca.uhn.fhir.model.dstu2.composite.HumanNameDt;
+import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
+import ca.uhn.fhir.model.dstu2.resource.Coverage;
+import ca.uhn.fhir.model.dstu2.resource.Organization;
 import ca.uhn.fhir.model.dstu2.resource.Patient;
 import ca.uhn.fhir.model.dstu2.valueset.AddressTypeEnum;
 import ca.uhn.fhir.model.dstu2.valueset.AdministrativeGenderEnum;
 import ca.uhn.fhir.model.primitive.IdDt;
+import ca.uhn.fhir.model.primitive.StringDt;
 import ca.uhn.fhir.rest.client.IGenericClient;
-import de.gecko.egkfeuer.model.PatientWrapper;
+import de.gecko.egkfeuer.model.EgkPatient;
 import de.gecko.egkfeuer.model.Sex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,20 +33,24 @@ public class PatientToFhirServiceDSTU2 {
         this.serverBase = serverBase;
     }
 
-    public String sendPatientToFhirServer(PatientWrapper patient) {
+    public String sendPatientToFhirServer(EgkPatient patient) {
         FhirContext ctx = FhirContext.forDstu2();
         IGenericClient client = ctx.newRestfulGenericClient(serverBase);
 
         //set Identifier
         Patient fhirPatient = new Patient();
         fhirPatient.addIdentifier()
-                .setSystem("http://hl7.de/fhir/KVNR")
+                .setSystem("http://fhir.de/NamingSystem/gkv/kvnr")
                 .setValue(patient.getHealthInsuranceNumber());
         //setName
-        fhirPatient.addName()
-                .addFamily(patient.getSurname())
+        HumanNameDt name = new HumanNameDt();
+        name.addFamily(patient.getSurname())
                 .addGiven(patient.getGivenName())
-                .addPrefix(patient.getTitle());
+                .addPrefix(patient.getTitle())
+                .addSuffix(patient.getNamenszusatz());
+        ExtensionDt vorsatzwort = new ExtensionDt(false, "http://fhir.de/StructureDefinition/kbv/egk/vorsatzwort", new StringDt(patient.getVorsatzwort()));
+        name.addUndeclaredExtension(vorsatzwort);
+        fhirPatient.addName(name);
 
         //setSex
         if (patient.getSex() == Sex.FEMALE)
@@ -57,7 +67,13 @@ public class PatientToFhirServiceDSTU2 {
         //TODO: AdressType postal, other Countries than Germany
         List<AddressDt> adresses = new ArrayList<AddressDt>();
         AddressDt adress = new AddressDt();
-        adress.addLine(patient.getStreetAndNumber()).setCity(patient.getCity()).setType(AddressTypeEnum.PHYSICAL).setPostalCode(patient.getZip()).setCountry("Germany");
+        adress.addLine(patient.getStreetname() + " " + patient.getHousenumber()).setCity(patient.getCity()).setType(AddressTypeEnum.PHYSICAL).setPostalCode(patient.getZip()).setCountry("Germany");
+
+
+        ExtensionDt streetname = new ExtensionDt(false, "http://hl7.org/fhir/StructureDefinition/iso21090-ADXP-streetName", new StringDt(patient.getStreetname()));
+        ExtensionDt housenumber = new ExtensionDt(false, "http://hl7.org/fhir/StructureDefinition/iso21090-ADXP-houseNumber", new StringDt(patient.getHousenumber()));
+        adress.addUndeclaredExtension(streetname);
+        adress.addUndeclaredExtension(housenumber);
         adresses.add(adress);
         fhirPatient.setAddress(adresses);
 
@@ -66,9 +82,32 @@ public class PatientToFhirServiceDSTU2 {
                 "http://fhir.de/StructureDefinition/kbv/persoenlicheVersicherungsdaten");
 
         //submitToServer
-        IdDt id = (IdDt) client.update().resource(fhirPatient).conditional().where(Patient.IDENTIFIER.exactly().systemAndIdentifier("http://hl7.de/fhir/KVNR", patient.getHealthInsuranceNumber()))
+        IdDt idPatient = (IdDt) client.update().resource(fhirPatient).conditional()
+                .where(Patient.IDENTIFIER.exactly().systemAndIdentifier("http://fhir.de/NamingSystem/gkv/kvnr", patient.getHealthInsuranceNumber()))
                 .execute().getId();
-        logger.info("Patient with ID: " + id + " generated");
-        return id.toString();
+        logger.info("EgkPatient with ID: " + idPatient + " generated");
+
+
+        Organization healthInsurance = new Organization();
+        healthInsurance.addIdentifier()
+                .setSystem("http://fhir.de/NamingSystem/gkv/iknr")
+                .setValue(patient.getHealthInsuranceProviderNumber());
+        healthInsurance.setName(patient.getHealthInsuranceProviderName());
+        IdDt idInsurance = (IdDt) client.update().resource(healthInsurance).conditional()
+                .where(Organization.IDENTIFIER.exactly().systemAndIdentifier("http://fhir.de/NamingSystem/gkv/iknr",patient.getHealthInsuranceProviderNumber()))
+                .execute().getId();
+        logger.info("Organization with ID: " + idInsurance + " generated");
+
+        Coverage coverage = new Coverage();
+        coverage.addIdentifier()
+                .setSystem("http://fhir.de/NamingSystem/gkv/kvnr").setValue(patient.getHealthInsuranceNumber());
+        coverage.setIssuer(new ResourceReferenceDt(idInsurance))
+                .setSubscriber(new ResourceReferenceDt(idPatient));
+        IdDt idCoverage = (IdDt) client.update().resource(coverage).conditional()
+                .where(Coverage.IDENTIFIER.exactly().systemAndIdentifier("http://fhir.de/NamingSystem/gkv/kvnr", patient.getHealthInsuranceNumber()))
+                .execute().getId();
+        logger.info("Coverage with ID: " + idCoverage + " generated");
+
+        return idPatient.toString();
     }
 }

@@ -1,6 +1,7 @@
 package de.gecko.egkfeuer.model.ekg;
 
-import de.gecko.egkfeuer.model.PatientWrapper;
+import de.gecko.egkfeuer.model.EgkPatient;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -37,7 +38,7 @@ public class DelegatingToPatientConverter implements ToPatientConverter
 	}
 
 	@Override
-	public PatientWrapper toPatient(String pdContent, String vdContent)
+	public EgkPatient toPatient(String pdContent, String vdContent)
 	{
 		for (ToPatientConverter c : converters)
 			if (c.isPdCompatible(pdContent) && c.isVdCompatible(vdContent))

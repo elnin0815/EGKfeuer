@@ -1,6 +1,6 @@
 package de.gecko.egkfeuer.model.ekg.v51;
 
-import de.gecko.egkfeuer.model.PatientWrapper;
+import de.gecko.egkfeuer.model.EgkPatient;
 import de.gecko.egkfeuer.model.ekg.ToPatientConverter;
 import de.gecko.egkfeuer.service.PatientToFhirServiceDSTU2;
 import org.apache.commons.io.IOUtils;
@@ -13,7 +13,7 @@ import java.nio.file.Paths;
 import static org.junit.Assert.*;
 
 
-public class ToPatientWrapperConverterV51Test
+public class ToEgkPatientConverterV51Test
 {
 	private ToPatientConverter converter;
 
@@ -34,7 +34,7 @@ public class ToPatientWrapperConverterV51Test
 		assertTrue(converter.isPdCompatible(pdContent));
 		assertTrue(converter.isVdCompatible(vdContent));
 
-		PatientWrapper patient = converter.toPatient(pdContent, vdContent);
+		EgkPatient patient = converter.toPatient(pdContent, vdContent);
 
 		assertNotNull(patient);
 	}
@@ -51,7 +51,7 @@ public class ToPatientWrapperConverterV51Test
 		assertTrue(converter.isPdCompatible(pdContent));
 		assertTrue(converter.isVdCompatible(vdContent));
 
-		PatientWrapper patient = converter.toPatient(pdContent, vdContent);
+		EgkPatient patient = converter.toPatient(pdContent, vdContent);
 		assertNotNull(fhirConverter.sendPatientToFhirServer(patient));
 	}
 

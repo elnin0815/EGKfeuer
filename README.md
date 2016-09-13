@@ -1,5 +1,3 @@
 # EGKfeuer
-currently the project can be found under: 
-https://github.com/elnin0815/EGKfhir/
+A project to read the German health insurance card (Elektronische Gesundheitskarte (EGK)), transform the read data to FHIR(R) ressources, and send them to a choosable FHIR Endpoint.
 
-it will move to this repo soon

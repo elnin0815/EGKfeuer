@@ -1,10 +1,10 @@
 package de.gecko.egkfeuer.service;
 
-import de.gecko.egkfeuer.model.PatientWrapper;
+import de.gecko.egkfeuer.model.EgkPatient;
 
 public interface CardReaderService
 {
-	PatientWrapper read() throws de.gecko.egkfeuer.exception.smartcard.CardException;
+	EgkPatient read() throws de.gecko.egkfeuer.exception.smartcard.CardException;
 
 	boolean isCardReaderPresent();
 }
